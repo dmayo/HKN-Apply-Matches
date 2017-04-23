@@ -1,0 +1,119 @@
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script
+	  src="https://code.jquery.com/jquery-3.2.1.min.js"
+	  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+	  crossorigin="anonymous"></script>
+	<script type="text/javascript">
+		PATH_TO_MATCHES_FILE = "matches.txt";
+		tableData=[];
+		approvals={};
+		$( document ).ready(function() {
+		  	var data;
+		  	$.ajax({
+			    url: PATH_TO_MATCHES_FILE,
+			    async: false,
+			    success: function (data) {
+			        rows=data.split("\n")
+			        console.log(rows[0]);
+			        //out = [];
+			        for (var i=0;i<rows.length;i++){
+			        	tableData[i]=rows[i].split(",");
+			        }
+			        makeTable();
+			    },
+			    dataType: "text",
+			    complete: function () {
+
+			    }
+			});
+		});
+
+		function makeTable(){
+
+			var out = "";
+			for (var i=0;i<tableData.length;i++){
+				out+="<tr id='"+i+"'>";
+				for (var j=0;j<tableData[0].length;j++){
+					out+="<td>";
+					out+=tableData[i][j];
+					out+="</td>";
+				}
+				out+="<td id='d"+j+"''>";
+				out+="<button onClick='stageApproval(\""+i+"\",true);'>Yes</button><button onClick='stageApproval(\""+i+"\",false);'>No</button>";
+				out+="</td>";
+				out+="</tr>";
+			}
+	        $("table tbody").append(out);
+	        $("#count").append(i + " matches to approve");
+		}
+
+		function stageApproval(id, response){
+			if (response){
+				//apply match to database and maek row green
+				$("#"+id+" td").css('background-color','green');
+				undo="<button onClick='undoApproval(\""+id+"\");'>Undo</button>";
+				$("#"+id+" #d7").html(undo);
+				approvals[id]=true;
+			}
+			else{
+				//delete match from text file and make row red
+				$("#"+id+" td").css('background-color','red');
+				undo="<button onClick='undoApproval(\""+id+"\");'>Undo</button>";
+				$("#"+id+" #d7").html(undo);
+				approvals[id]=false;
+			}
+		}
+
+		function undoApproval(id){
+			$("#"+id+" td").css('background-color','white');
+			buttons="<button onClick='stageApproval(\""+id+"\",true);'>Yes</button><button onClick='stageApproval(\""+id+"\",false);'>No</button>";
+			$("#"+id+" #d7").html(buttons);
+			delete approvals[id];
+		}
+
+		function submitApprovals(){
+		    $.ajax({
+		        url: '18.189.110.212:1337',
+		        // dataType: "jsonp",
+		        data: '{"data": "TEST"}',
+		        type: 'POST',
+		        success: function (data) {
+		            var ret = jQuery.parseJSON(data);
+		            //$('#lblResponse').html(ret.msg);
+		            console.log('Success: ')
+		        },
+		        error: function (xhr, status, error) {
+		            console.log('Error: ' + error.message);
+		            //$('#lblResponse').html('Error connecting to the server.');
+		        },
+		    });
+		}
+
+	</script>
+</head>
+<body>
+	<div id="container">
+	<h3>Tutoring Matches</h3>
+	<table class="mainTable">
+		<thead>
+            <tr>
+				<th>Tutor Id</th>
+				<th>Tutor Name</th>
+				<th>Tutee Id</th>
+				<th>Tutee Name</th>
+				<th>Class Id</th>
+				<th>Class Name</th>
+				<th># Hours</th>
+				<th>Approve</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+	</table>
+	<div id="count"></div>
+	<button onClick="submitApprovals();">Submit Approvals</button>
+	</div>
+</body>
+</html

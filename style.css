@@ -1,0 +1,28 @@
+body{
+	font-family: helvetica;
+}
+#container{
+	width: 900px; 
+	margin: 0 auto;
+}
+.mainTable{
+	width:100%;
+	text-align: center;
+	margin: 0 auto;
+	border-collapse: collapse;
+}
+.mainTable td{
+	border-top:1px solid black;
+}
+
+.mainTable thead th{
+	text-align:left;
+	min-width:100px;
+	height:20px;
+}
+
+.mainTable tbody td{
+	text-align:left;
+	min-width:100px;
+	height:35px;
+}
